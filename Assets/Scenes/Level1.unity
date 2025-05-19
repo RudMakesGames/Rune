@@ -9143,6 +9143,30 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 59d3d973-a53f-42ad-a59e-f861a1c040ca
     m_ActionName: Player/OpenSkillTree[/Keyboard/b]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: b25f7f12-5064-4cae-9db1-99b46d14813f
+    m_ActionName: Player/Ability1[/Keyboard/q]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: b02310e1-675f-4719-bc4c-1c96ef80150f
+    m_ActionName: Player/Ability2[/Keyboard/e]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: baa6b8c6-7c53-4c66-948e-0b52e3cdb880
+    m_ActionName: Player/Ability3[/Keyboard/r]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 182a01d6-a358-4d73-9502-088f1fbc6b98
+    m_ActionName: Player/Ability4[/Keyboard/t]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 61326019-113d-4408-ae78-139282875892
+    m_ActionName: Player/ThrowDistraction[/Keyboard/g]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 28f94ac3-e4ac-405c-ab76-69fc2be80ef0
+    m_ActionName: Test/TestAction[/Keyboard/z]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Keyboard&Mouse
   m_DefaultActionMap: Player
@@ -12729,6 +12753,10 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 28f94ac3-e4ac-405c-ab76-69fc2be80ef0
     m_ActionName: Test/TestAction[/Keyboard/z]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 61326019-113d-4408-ae78-139282875892
+    m_ActionName: Player/ThrowDistraction[/Keyboard/g]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -12744,7 +12772,7 @@ Animator:
   m_GameObject: {fileID: 953285330}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: be00c9c1c1c57024aa5777315d92617e, type: 2}
+  m_Controller: {fileID: 9100000, guid: 36edbf9ee835d944ba67c9279251575d, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -23352,6 +23380,30 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 59d3d973-a53f-42ad-a59e-f861a1c040ca
     m_ActionName: Player/OpenSkillTree[/Keyboard/b]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: b25f7f12-5064-4cae-9db1-99b46d14813f
+    m_ActionName: Player/Ability1[/Keyboard/q]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: b02310e1-675f-4719-bc4c-1c96ef80150f
+    m_ActionName: Player/Ability2[/Keyboard/e]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: baa6b8c6-7c53-4c66-948e-0b52e3cdb880
+    m_ActionName: Player/Ability3[/Keyboard/r]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 182a01d6-a358-4d73-9502-088f1fbc6b98
+    m_ActionName: Player/Ability4[/Keyboard/t]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 61326019-113d-4408-ae78-139282875892
+    m_ActionName: Player/ThrowDistraction[/Keyboard/g]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 28f94ac3-e4ac-405c-ab76-69fc2be80ef0
+    m_ActionName: Test/TestAction[/Keyboard/z]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player

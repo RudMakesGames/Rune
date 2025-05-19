@@ -437,6 +437,17 @@
                 },
                 {
                     "name": "",
+                    "id": "cd21e123-902e-46fe-aaa1-373d9f5f9c20",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Assasinate",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "66af2424-7efd-437b-a9b2-774da8a1b582",
                     "path": "<Keyboard>/leftShift",
                     "interactions": "",

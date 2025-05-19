@@ -15,7 +15,7 @@ public class StealthKill : MonoBehaviour
         if (EventManager.Instance.isEventActive) return;
         if (context.performed && InRangeOfKill)
         {
-            // Only allow killing if the enemy has not seen the player
+            
             if (!StealthManager.instance.IsPlayerSpotted)
             {
                 anim.SetTrigger("Stab");

@@ -12,7 +12,7 @@ public class EnemyAttack : MonoBehaviour
         {
             PlayerHealth playerHealth = collision.GetComponent<PlayerHealth>();       
                 playerHealth.TakeDamage(Damage);
-                playerHealth.ReturnAttack();
+                playerHealth.SetBackToHitable();
         }
     }
 

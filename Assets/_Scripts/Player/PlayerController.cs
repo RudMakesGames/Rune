@@ -26,6 +26,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform GroundCheck;
     [SerializeField] public Transform FiringPoint;
     public LayerMask groundLayer;
+    public LayerMask HitableLayer;
+
     [SerializeField]
     private RuntimeAnimatorController Normalcontroller;
     [SerializeField]
@@ -93,6 +95,20 @@ public class PlayerController : MonoBehaviour
     public AirStealthKill airStealthKill;
     public float Killspeed = 2f;
 
+    [Header("Stealth Kill")]
+    [SerializeField]
+    float StealthKillRange = 5f;
+
+    [SerializeField]
+    float CircleRadius = 1f;
+
+    bool IsInRangeToKill;
+    Transform EnemyPos;
+
+    [SerializeField]
+    AudioClip KillSfx;
+
+
     public GameObject SkillTree;
     private bool isSkillTreeOpen;
     public AudioSource Walksfx;
@@ -109,6 +125,8 @@ public class PlayerController : MonoBehaviour
     private float DistractionTimer = 0f;
     public float ThrowForce = 500f;
     Vector3 ThrownDirection = Vector3.right * 0.5f;
+
+    private ShowSkullOnKillableEnemy _previousSkullTarget;
     public enum Element
     {
         None,
@@ -145,10 +163,11 @@ public class PlayerController : MonoBehaviour
         {
             rb.gravityScale = 1f;
         }
+        
     }
     void Update()
     {
-      
+       
         Vector2 direction = new Vector2(horizontal, vertical);
         Anim.SetFloat("VerticalAxis",Mathf.Abs(direction.y));
         if (EventManager.Instance.isEventActive)
@@ -163,14 +182,12 @@ public class PlayerController : MonoBehaviour
             Anim.ResetTrigger("Attack");
             return;
         }
-        if (!wasGrounded && isGrounded())
-        {
-            landingSfx.Play();
-        }
+        // Tutorial 
         if (hasSneakActivated)
         {
             Destroy(Collider);
         }
+        //Climbing
         if (Mathf.Abs(vertical) > 0f && IsLadder)
         {
             CanClimb = true;
@@ -181,6 +198,8 @@ public class PlayerController : MonoBehaviour
             CanClimb = false;
 
         }
+        //Climb End
+        CheckForStealthKill();
         if (Mathf.Abs(horizontal) > 0f && isGrounded())
         {
             Anim.SetBool("IsRunning", true);
@@ -202,7 +221,9 @@ public class PlayerController : MonoBehaviour
             Anim.SetBool("IsRunning", false);
             footstepTimer = 0f;
         }
+
         if (isBossFight) return;
+        //Jump Checks
         if (isGrounded())
         {
             Anim.SetBool("IsFalling", false);
@@ -211,6 +232,7 @@ public class PlayerController : MonoBehaviour
         {
             Anim.SetBool("IsFalling", true);
         }
+        //Dodge Timer
         if (dodgeCooldownTimer > 0)
         {
             dodgeCooldownTimer -= Time.deltaTime;
@@ -220,6 +242,8 @@ public class PlayerController : MonoBehaviour
             PunchDelayTimer += Time.deltaTime;
         }
         ShootingDelayTimer -= Time.deltaTime;
+
+        //Crouch Movement Changes
         if (isCrouching)
         {
             rb.velocity = new Vector2(horizontal * CrouchSpeed, rb.velocity.y);
@@ -228,6 +252,8 @@ public class PlayerController : MonoBehaviour
         {
             rb.velocity = new Vector2(horizontal * RunningSpeed, rb.velocity.y);
         }
+
+        //Distraction Object
         if(DistractionTimer > 0)
         {
             DistractionTimer -= Time.deltaTime;
@@ -237,6 +263,84 @@ public class PlayerController : MonoBehaviour
 
 
     }
+
+    #region StealthKill
+    private void CheckForStealthKill()
+    {
+        if(isCrouching)
+        {
+            RaycastHit2D hit = Physics2D.CircleCast(FiringPoint.position, CircleRadius, Vector2.right, StealthKillRange, HitableLayer);
+
+            if (hit.collider != null && hit.collider.TryGetComponent<IDamageable>(out var healthComponent))
+            {
+                if (hit.collider.TryGetComponent<ShowSkullOnKillableEnemy>(out var skull))
+                {
+                    // If we're looking at a new target, deactivate the old icon
+                    if (_previousSkullTarget != null && _previousSkullTarget != skull)
+                    {
+                        _previousSkullTarget.DeactivateIcon();
+                    }
+
+                    skull.ActivateIcon();
+                    _previousSkullTarget = skull;
+                    IsInRangeToKill = true;
+                    EnemyPos = skull.StealthKillPosition;
+                }
+            }
+            else
+            {
+                // No valid target deactivate the previous skull icon if any
+                if (_previousSkullTarget != null)
+                {
+                    _previousSkullTarget.DeactivateIcon();
+                    _previousSkullTarget = null;
+                }
+                IsInRangeToKill = false;
+                EnemyPos = null;
+            }
+        }
+       
+    }
+
+    public void ConfirmStealthKill(InputAction.CallbackContext context)
+    {
+        if(isCrouching)
+        {
+            if (IsInRangeToKill && context.performed)
+            {
+                transform.position = EnemyPos.position;
+                Anim.SetTrigger("Stab");
+            }
+        }
+       
+    }
+    public void CastKill()
+    {
+        if(isCrouching)
+        {
+            //used as an animation event
+            RaycastHit2D hit = Physics2D.CircleCast(FiringPoint.position, CircleRadius, Vector2.right, StealthKillRange, HitableLayer);
+
+            if (hit.collider != null && hit.collider.TryGetComponent<IDamageable>(out var healthComponent))
+            {
+                hit.collider.TryGetComponent<WindEnemy>(out var windenemy);
+                hit.collider.TryGetComponent<FireEnemy>(out var fireEnemy);
+                hit.collider.TryGetComponent<WaterEnemy>(out var waterenemy);
+                
+                waterenemy?.HandleDeath();
+                windenemy?.HandleDeath();
+                fireEnemy?.HandleDeath();
+
+
+            }
+        }
+     
+    }
+    public void PlayStabSoundEffect()
+    {
+        AudioManager.instance.PlaySoundFXClip(KillSfx, transform, 0.4f, Random.Range(0.9f, 1));
+    }
+    #endregion
     public void PlayFootstepSound()
     {
         Walksfx.pitch = Random.Range(minPitch, maxPitch);
@@ -253,6 +357,10 @@ public class PlayerController : MonoBehaviour
         Vector3 localScale = transform.localScale;
         localScale.x *= -1f;
         transform.localScale = localScale;
+    }
+    public void PlayLandSoundSfx()
+    {
+        landingSfx.Play();
     }
     #region Moving
     public void MoveHorizontally(InputAction.CallbackContext context)
@@ -427,6 +535,7 @@ public class PlayerController : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.DrawWireSphere(FiringPoint.position, AttackRange);
+        Gizmos.DrawWireSphere(FiringPoint.position, StealthKillRange);
         Gizmos.DrawWireSphere(transform.position, SoundCircleRadius);
     }
     public void FireElement(InputAction.CallbackContext context)

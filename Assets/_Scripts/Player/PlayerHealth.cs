@@ -69,7 +69,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
             HealthSlider.value = CurrentHealth;
         }
     }
-    public void ReturnAttack()
+    public void SetBackToHitable()
     {
         HasBeenHit = false;
     }
