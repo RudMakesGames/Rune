@@ -83,7 +83,7 @@ using UnityEngine.InputSystem;
                             playerDetection.MovementVar = 0;
                             playerDetection.enabled = false;
                             StartCoroutine(DisableCollider());
-                            playerController.MoveTowardsEnemy();
+                           
                             ThrowableKnifeManager.Instance.AddOnePoint();
                             playerDetection.enabled = false;
                             if (Vector2.Distance(playerController.PlayerPos.position, EnemyPos.position) < 2f)
@@ -102,7 +102,7 @@ using UnityEngine.InputSystem;
                             playerDetection.MovementVar = 0;
                             playerDetection.enabled = false;
                             StartCoroutine(DisableCollider());
-                            playerController.MoveTowardsEnemy();
+                           
 
                             ThrowableKnifeManager.Instance.AddOnePoint();
                             playerDetection.enabled = false;
@@ -125,7 +125,7 @@ using UnityEngine.InputSystem;
                             playerDetection.MovementVar = 0;
                             playerDetection.enabled = false;
                             StartCoroutine(DisableCollider());
-                            playerController.MoveTowardsEnemy();
+                            
                             ThrowableKnifeManager.Instance.AddOnePoint();
                             playerDetection.enabled = false;
                             if (Vector2.Distance(playerController.PlayerPos.position, EnemyPos.position) < 2f)

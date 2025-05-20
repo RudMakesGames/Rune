@@ -32,8 +32,7 @@ public class PlayerController : MonoBehaviour
     private RuntimeAnimatorController Normalcontroller;
     [SerializeField]
     private RuntimeAnimatorController Crouchcontroller;
-    [SerializeField]
-    private GameObject AirStealthCollider;
+    
 
     private bool isCrouching;
     public bool isFacingRight = true;
@@ -91,14 +90,12 @@ public class PlayerController : MonoBehaviour
     private DoubleJump doubleJump;
     private bool IsClimbingMoving;
 
-    [Header("Air kILLS")]
-    public AirStealthKill airStealthKill;
-    public float Killspeed = 2f;
+   
 
     [Header("Stealth Kill")]
     [SerializeField]
     float StealthKillRange = 5f;
-
+    bool isKilling = false;
     [SerializeField]
     float CircleRadius = 1f;
 
@@ -269,35 +266,39 @@ public class PlayerController : MonoBehaviour
     {
         if(isCrouching)
         {
-            RaycastHit2D hit = Physics2D.CircleCast(FiringPoint.position, CircleRadius, Vector2.right, StealthKillRange, HitableLayer);
-
-            if (hit.collider != null && hit.collider.TryGetComponent<IDamageable>(out var healthComponent))
+            if(!StealthManager.instance.IsPlayerSpotted)
             {
-                if (hit.collider.TryGetComponent<ShowSkullOnKillableEnemy>(out var skull))
+                RaycastHit2D hit = Physics2D.CircleCast(FiringPoint.position, CircleRadius, Vector2.right, StealthKillRange, HitableLayer);
+
+                if (hit.collider != null && hit.collider.TryGetComponent<IDamageable>(out var healthComponent))
                 {
-                    // If we're looking at a new target, deactivate the old icon
-                    if (_previousSkullTarget != null && _previousSkullTarget != skull)
+                    if (hit.collider.TryGetComponent<ShowSkullOnKillableEnemy>(out var skull))
+                    {
+                        // If we're looking at a new target, deactivate the old icon
+                        if (_previousSkullTarget != null && _previousSkullTarget != skull)
+                        {
+                            _previousSkullTarget.DeactivateIcon();
+                        }
+
+                        skull.ActivateIcon();
+                        _previousSkullTarget = skull;
+                        IsInRangeToKill = true;
+                        EnemyPos = skull.StealthKillPosition;
+                    }
+                }
+                else
+                {
+                    // No valid target deactivate the previous skull icon if any
+                    if (_previousSkullTarget != null)
                     {
                         _previousSkullTarget.DeactivateIcon();
+                        _previousSkullTarget = null;
                     }
-
-                    skull.ActivateIcon();
-                    _previousSkullTarget = skull;
-                    IsInRangeToKill = true;
-                    EnemyPos = skull.StealthKillPosition;
+                    IsInRangeToKill = false;
+                    EnemyPos = null;
                 }
             }
-            else
-            {
-                // No valid target deactivate the previous skull icon if any
-                if (_previousSkullTarget != null)
-                {
-                    _previousSkullTarget.DeactivateIcon();
-                    _previousSkullTarget = null;
-                }
-                IsInRangeToKill = false;
-                EnemyPos = null;
-            }
+           
         }
        
     }
@@ -308,11 +309,23 @@ public class PlayerController : MonoBehaviour
         {
             if (IsInRangeToKill && context.performed)
             {
-                transform.position = EnemyPos.position;
-                Anim.SetTrigger("Stab");
+                if(!isKilling)
+                {
+                    isKilling = true;
+                    transform.position = EnemyPos.position;
+                    Anim.SetTrigger("Stab");
+                    StartCoroutine(PeformKill());
+
+                }
+               
             }
         }
        
+    }
+    private IEnumerator PeformKill()
+    {
+        yield return new WaitForSeconds(2);
+        isKilling = false;  
     }
     public void CastKill()
     {
@@ -682,14 +695,7 @@ public class PlayerController : MonoBehaviour
         }
 
     }
-    public void MoveTowardsEnemy()
-    {
-        if (airStealthKill.EnemyPos != null)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, airStealthKill.EnemyPos.position, Killspeed);
-
-        }
-    }
+  
     private void DisableElementalBars()
     {
         FireSlider.SetActive(false);
@@ -747,7 +753,7 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("Ladder"))
         {
             IsLadder = true;
-            AirStealthCollider.SetActive(true);
+           
             Anim.SetBool("IsClimbing", true);
         }
     }
@@ -757,7 +763,7 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("Ladder"))
         {
             IsLadder = false;
-            AirStealthCollider.SetActive(false);
+           
             Anim.SetBool("IsClimbing", false);
             IsClimbingMoving = false;
 
@@ -768,7 +774,7 @@ public class PlayerController : MonoBehaviour
         if (isBossFight) return;
         if (collision.gameObject.CompareTag("Top"))
         {
-            AirStealthCollider.SetActive(true);
+           
         }
 
         if (collision.gameObject.CompareTag("Ground"))
@@ -782,7 +788,7 @@ public class PlayerController : MonoBehaviour
         if (isBossFight) return;
         if (collision.gameObject.CompareTag("Top"))
         {
-            AirStealthCollider.SetActive(false);
+            
         }
     }
     #endregion
