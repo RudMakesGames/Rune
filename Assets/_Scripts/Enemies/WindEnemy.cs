@@ -57,7 +57,11 @@ public class WindEnemy : MonoBehaviour, IDamageable
     // Update is called once per frame
     void Update()
     {
-        HealthSlider.value = CurrentHealth;
+        if (HealthSlider!= null)
+        {
+            HealthSlider.value = CurrentHealth;
+        }
+       
     }
     private IEnumerator FadeOut()
     {

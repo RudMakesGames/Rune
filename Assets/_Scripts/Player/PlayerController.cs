@@ -90,20 +90,30 @@ public class PlayerController : MonoBehaviour
     private DoubleJump doubleJump;
     private bool IsClimbingMoving;
 
-   
+
 
     [Header("Stealth Kill")]
+    [SerializeField]
+    private Transform AirAssasinationTransform;
     [SerializeField]
     float StealthKillRange = 5f;
     bool isKilling = false;
     [SerializeField]
     float CircleRadius = 1f;
+    [SerializeField]
+    float AirCircleRadius = 2f;
 
     bool IsInRangeToKill;
     Transform EnemyPos;
 
     [SerializeField]
     AudioClip KillSfx;
+
+    [SerializeField]
+    float AerialStealthKillRange = 2f;
+    private GameObject _currentEnemyTarget;
+
+    bool IsAllowedToAirAssasinate = false;
 
 
     public GameObject SkillTree;
@@ -164,7 +174,9 @@ public class PlayerController : MonoBehaviour
     }
     void Update()
     {
-       
+        
+        CheckForAirKill();
+        
         Vector2 direction = new Vector2(horizontal, vertical);
         Anim.SetFloat("VerticalAxis",Mathf.Abs(direction.y));
         if (EventManager.Instance.isEventActive)
@@ -196,6 +208,10 @@ public class PlayerController : MonoBehaviour
 
         }
         //Climb End
+       
+        
+        
+        
         CheckForStealthKill();
         if (Mathf.Abs(horizontal) > 0f && isGrounded())
         {
@@ -302,7 +318,75 @@ public class PlayerController : MonoBehaviour
         }
        
     }
+    private void CheckForAirKill()
+    {
+        if(IsAllowedToAirAssasinate)
+        {
+            if (!StealthManager.instance.IsPlayerSpotted)
+            {
+                RaycastHit2D hit2d = Physics2D.CircleCast(AirAssasinationTransform.position, AirCircleRadius, Vector2.right, AerialStealthKillRange, HitableLayer);
+                
+                if (hit2d.collider != null && hit2d.collider.TryGetComponent<IDamageable>(out var healthComponent))
+                {
+                    
+                    if (hit2d.collider.TryGetComponent<ShowSkullOnKillableEnemy>(out var skull))
+                    {
+                      
+                        // If we're looking at a new target, deactivate the old icon
+                        if (_previousSkullTarget != null && _previousSkullTarget != skull)
+                        {
+                            _previousSkullTarget.DeactivateIcon();
+                        }
 
+                        skull.ActivateIcon();
+                        _previousSkullTarget = skull;
+                        IsInRangeToKill = true;
+                        EnemyPos = skull.StealthKillPosition;
+
+
+                        _currentEnemyTarget = hit2d.collider.gameObject;
+
+                    }
+                }
+                else
+                {
+
+                    if (_previousSkullTarget != null)
+                    {
+                        _previousSkullTarget.DeactivateIcon();
+                        _previousSkullTarget = null;
+                    }
+
+                    IsInRangeToKill = false;
+                    EnemyPos = null;
+                    _currentEnemyTarget = null;
+                }
+            }
+        }
+    }
+    public void ConfirmAirAssasination(InputAction.CallbackContext context)
+    {
+        
+        
+            if(IsAllowedToAirAssasinate)
+            {
+                if (IsInRangeToKill && context.performed)
+                {
+                    if (!isKilling && _currentEnemyTarget != null)
+                    {
+                        Debug.Log("air assasination performed");
+                        isKilling = true;
+                        _currentEnemyTarget.GetComponent<CurveFollower>()?.StartCurveFollow(gameObject);
+                        
+                        StartCoroutine(PeformKill());
+
+                    }
+
+                }
+            }
+           
+        
+    }
     public void ConfirmStealthKill(InputAction.CallbackContext context)
     {
         if(isCrouching)
@@ -329,8 +413,8 @@ public class PlayerController : MonoBehaviour
     }
     public void CastKill()
     {
-        if(isCrouching)
-        {
+        
+        
             //used as an animation event
             RaycastHit2D hit = Physics2D.CircleCast(FiringPoint.position, CircleRadius, Vector2.right, StealthKillRange, HitableLayer);
 
@@ -346,7 +430,7 @@ public class PlayerController : MonoBehaviour
 
 
             }
-        }
+        
      
     }
     public void PlayStabSoundEffect()
@@ -548,7 +632,8 @@ public class PlayerController : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.DrawWireSphere(FiringPoint.position, AttackRange);
-        Gizmos.DrawWireSphere(FiringPoint.position, StealthKillRange);
+        Gizmos.DrawWireSphere(AirAssasinationTransform.position, AirCircleRadius);
+        Gizmos.DrawWireSphere(FiringPoint.position, CircleRadius);
         Gizmos.DrawWireSphere(transform.position, SoundCircleRadius);
     }
     public void FireElement(InputAction.CallbackContext context)
@@ -774,7 +859,8 @@ public class PlayerController : MonoBehaviour
         if (isBossFight) return;
         if (collision.gameObject.CompareTag("Top"))
         {
-           
+           IsAllowedToAirAssasinate = true;
+            Debug.Log("Can Air assasinate");
         }
 
         if (collision.gameObject.CompareTag("Ground"))
@@ -788,7 +874,8 @@ public class PlayerController : MonoBehaviour
         if (isBossFight) return;
         if (collision.gameObject.CompareTag("Top"))
         {
-            
+            IsAllowedToAirAssasinate = false;
+            Debug.LogWarning("Cannot Air assasinate");
         }
     }
     #endregion

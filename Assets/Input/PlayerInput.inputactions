@@ -69,6 +69,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "AirAssasinate",
+                    "type": "Button",
+                    "id": "b48e5b4a-b6d9-4bb9-8e1a-040a86f2804c",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Fire",
                     "type": "Button",
                     "id": "4eecd6fd-21b3-4679-bc79-4581dcc297ff",
@@ -426,17 +435,6 @@
                 },
                 {
                     "name": "",
-                    "id": "d340b2a8-33cc-4a03-84a3-f3b5283b932b",
-                    "path": "<Keyboard>/x",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Assasinate",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "cd21e123-902e-46fe-aaa1-373d9f5f9c20",
                     "path": "<Mouse>/leftButton",
                     "interactions": "",
@@ -531,6 +529,39 @@
                     "processors": "",
                     "groups": "",
                     "action": "ThrowDistraction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2a343f43-ed30-404a-b387-da7199f03df6",
+                    "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AirAssasinate",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4b14da00-8121-4a12-b044-19a14662f568",
+                    "path": "<Keyboard>/x",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AirAssasinate",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "459ffe20-da0d-4feb-af6b-9ff664222f97",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AirAssasinate",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
