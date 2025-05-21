@@ -100,9 +100,8 @@ public class PlayerController : MonoBehaviour
     bool isKilling = false;
     [SerializeField]
     float CircleRadius = 1f;
-    [SerializeField]
-    float AirCircleRadius = 2f;
-
+    [SerializeField] private Vector2 capsuleSize = new Vector2(1f, 1.5f); // Width and Height of the capsule
+    [SerializeField] private Vector2 capsuleOffset = new Vector2(0f, -0.5f);
     bool IsInRangeToKill;
     Transform EnemyPos;
 
@@ -174,9 +173,17 @@ public class PlayerController : MonoBehaviour
     }
     void Update()
     {
-        
+        if(!isGrounded())
+        {
+            IsAllowedToAirAssasinate = true;
+            
+        }
+        else
+        {
+            IsAllowedToAirAssasinate = false;
+        }
         CheckForAirKill();
-        
+
         Vector2 direction = new Vector2(horizontal, vertical);
         Anim.SetFloat("VerticalAxis",Mathf.Abs(direction.y));
         if (EventManager.Instance.isEventActive)
@@ -304,7 +311,7 @@ public class PlayerController : MonoBehaviour
                 }
                 else
                 {
-                    // No valid target deactivate the previous skull icon if any
+                    
                     if (_previousSkullTarget != null)
                     {
                         _previousSkullTarget.DeactivateIcon();
@@ -320,11 +327,14 @@ public class PlayerController : MonoBehaviour
     }
     private void CheckForAirKill()
     {
-        if(IsAllowedToAirAssasinate)
+        Vector2 origin = (Vector2)AirAssasinationTransform.position + capsuleOffset;
+        if (IsAllowedToAirAssasinate)
         {
             if (!StealthManager.instance.IsPlayerSpotted)
+
+               
             {
-                RaycastHit2D hit2d = Physics2D.CircleCast(AirAssasinationTransform.position, AirCircleRadius, Vector2.right, AerialStealthKillRange, HitableLayer);
+                RaycastHit2D hit2d = Physics2D.CapsuleCast(origin, capsuleSize,CapsuleDirection2D.Vertical,0f,Vector2.down, AerialStealthKillRange, HitableLayer);
                 
                 if (hit2d.collider != null && hit2d.collider.TryGetComponent<IDamageable>(out var healthComponent))
                 {
@@ -376,9 +386,9 @@ public class PlayerController : MonoBehaviour
                     {
                         Debug.Log("air assasination performed");
                         isKilling = true;
-                        _currentEnemyTarget.GetComponent<CurveFollower>()?.StartCurveFollow(gameObject);
-                        
-                        StartCoroutine(PeformKill());
+                    _currentEnemyTarget.GetComponent<CurveFollower>()?.StartLerpToTarget(gameObject, EnemyPos);
+
+                    StartCoroutine(PeformKill());
 
                     }
 
@@ -631,8 +641,10 @@ public class PlayerController : MonoBehaviour
     }
     private void OnDrawGizmosSelected()
     {
+        Gizmos.color = Color.red;
+        Vector2 origin = (Vector2)AirAssasinationTransform.position + capsuleOffset;
         Gizmos.DrawWireSphere(FiringPoint.position, AttackRange);
-        Gizmos.DrawWireSphere(AirAssasinationTransform.position, AirCircleRadius);
+        Gizmos.DrawWireCube(origin + Vector2.down * (AerialStealthKillRange / 2f), new Vector3(capsuleSize.x, AerialStealthKillRange, 0.1f));
         Gizmos.DrawWireSphere(FiringPoint.position, CircleRadius);
         Gizmos.DrawWireSphere(transform.position, SoundCircleRadius);
     }
@@ -859,8 +871,7 @@ public class PlayerController : MonoBehaviour
         if (isBossFight) return;
         if (collision.gameObject.CompareTag("Top"))
         {
-           IsAllowedToAirAssasinate = true;
-            Debug.Log("Can Air assasinate");
+           
         }
 
         if (collision.gameObject.CompareTag("Ground"))
@@ -874,8 +885,7 @@ public class PlayerController : MonoBehaviour
         if (isBossFight) return;
         if (collision.gameObject.CompareTag("Top"))
         {
-            IsAllowedToAirAssasinate = false;
-            Debug.LogWarning("Cannot Air assasinate");
+           
         }
     }
     #endregion

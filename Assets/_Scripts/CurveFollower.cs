@@ -6,69 +6,48 @@ using UnityEngine;
 
 public class CurveFollower : MonoBehaviour
 {
-    public Transform[] curvePoints; // Assigned in Inspector as children
-    public float moveDuration = 1.0f;
+    public float moveDuration = 0.5f; // Time to reach enemy
+
     private bool isRunning = false;
 
-    public void StartCurveFollow(GameObject player)
+    public void StartLerpToTarget(GameObject player, Transform enemyTarget)
     {
-        if (!isRunning && player != null)
-            StartCoroutine(FollowCurve(player.transform));
+        if (!isRunning && player != null && enemyTarget != null)
+        {
+            StartCoroutine(LerpToTarget(player.transform, enemyTarget.position));
+        }
     }
 
-    private IEnumerator FollowCurve(Transform player)
+    private IEnumerator LerpToTarget(Transform player, Vector3 targetPos)
     {
         isRunning = true;
 
-        for (int i = 0; i < curvePoints.Length - 1; i++)
+        Vector3 startPos = player.position;
+        float elapsedTime = 0f;
+
+        while (elapsedTime < moveDuration)
         {
-            Vector3 start = curvePoints[i].position;
-            Vector3 end = curvePoints[i + 1].position;
-            float t = 0f;
+            float t = elapsedTime / moveDuration;
+            player.position = Vector3.Lerp(startPos, targetPos, t);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
 
-            while (t < 1f)
-            {
-                player.position = Vector3.Lerp(start, end, t);
-                t += Time.deltaTime / (moveDuration / (curvePoints.Length - 1));
-                yield return null;
-            }
+        player.position = targetPos;
 
-            player.position = end;
-            PlayerController playerController = player.GetComponent<PlayerController>();
-            playerController.CastKill();
+        // Optional: trigger a stab or assassination method
+        var controller = player.GetComponent<PlayerController>();
+        if (controller != null)
+        {
+            controller.CastKill();
+        }
+
+        Animator anim = player.GetComponent<Animator>();
+        if (anim != null)
+        {
+            anim.SetTrigger("Stab");
         }
 
         isRunning = false;
-
-        // Play stab animation on player
-        Animator playerAnim = player.GetComponent<Animator>();
-        if (playerAnim != null)
-        {
-            playerAnim.SetTrigger("Stab");
-        }
-        else
-        {
-            Debug.Log("No animator found");
-        }
-    }
-
-    // Scene view curve visualization
-    private void OnDrawGizmos()
-    {
-        if (curvePoints == null || curvePoints.Length < 2)
-            return;
-
-        Gizmos.color = Color.red;
-
-        for (int i = 0; i < curvePoints.Length - 1; i++)
-        {
-            if (curvePoints[i] != null && curvePoints[i + 1] != null)
-            {
-                Gizmos.DrawLine(curvePoints[i].position, curvePoints[i + 1].position);
-                Gizmos.DrawSphere(curvePoints[i].position, 0.05f);
-            }
-        }
-
-        Gizmos.DrawSphere(curvePoints[curvePoints.Length - 1].position, 0.05f);
     }
 }
