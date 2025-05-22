@@ -39,7 +39,7 @@ public class CurveFollower : MonoBehaviour
         var controller = player.GetComponent<PlayerController>();
         if (controller != null)
         {
-            controller.CastKill();
+            controller.CastAirAssasination();
         }
 
         Animator anim = player.GetComponent<Animator>();

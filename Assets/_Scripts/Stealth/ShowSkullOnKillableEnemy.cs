@@ -7,7 +7,7 @@ public class ShowSkullOnKillableEnemy : MonoBehaviour
     [SerializeField]
     private GameObject SkullIcon;
 
-  
+    public Transform AirAssasinationTransform;
     public Transform StealthKillPosition;
 
     public void ActivateIcon()

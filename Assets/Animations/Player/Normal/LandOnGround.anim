@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Jump
+  m_Name: LandOnGround
   serializedVersion: 7
   m_Legacy: 0
   m_Compressed: 0
@@ -21,19 +21,19 @@ AnimationClip:
   - serializedVersion: 2
     curve:
     - time: 0
-      value: {fileID: -872134421, guid: 0809f448a6b8284499eee36c2907b6ca, type: 3}
+      value: {fileID: -1898551676, guid: 5bace80d8b7ef3544a8ad0215920fd69, type: 3}
+    - time: 0.033333335
+      value: {fileID: -2099597079, guid: bebfb741b7065b141bb15c7dd8262e08, type: 3}
     - time: 0.083333336
-      value: {fileID: 1483866461, guid: d17f661566544144bbbd91188f1927ee, type: 3}
-    - time: 0.16666667
-      value: {fileID: -756914990, guid: c88230b95520db7429f4e5b461e0010b, type: 3}
-    - time: 0.25
-      value: {fileID: -1253789824, guid: 2dc7086e0259df3438fe7104acd9e090, type: 3}
+      value: {fileID: 768797689, guid: c78974b0b4505c646b17176ad5ebf08b, type: 3}
+    - time: 0.13333334
+      value: {fileID: -143125057, guid: 1f99a99115cf91840a5f7e3b4b015051, type: 3}
     attribute: m_Sprite
     path: 
     classID: 212
     script: {fileID: 0}
     flags: 2
-  m_SampleRate: 12
+  m_SampleRate: 60
   m_WrapMode: 0
   m_Bounds:
     m_Center: {x: 0, y: 0, z: 0}
@@ -50,16 +50,16 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     pptrCurveMapping:
-    - {fileID: -872134421, guid: 0809f448a6b8284499eee36c2907b6ca, type: 3}
-    - {fileID: 1483866461, guid: d17f661566544144bbbd91188f1927ee, type: 3}
-    - {fileID: -756914990, guid: c88230b95520db7429f4e5b461e0010b, type: 3}
-    - {fileID: -1253789824, guid: 2dc7086e0259df3438fe7104acd9e090, type: 3}
+    - {fileID: -1898551676, guid: 5bace80d8b7ef3544a8ad0215920fd69, type: 3}
+    - {fileID: -2099597079, guid: bebfb741b7065b141bb15c7dd8262e08, type: 3}
+    - {fileID: 768797689, guid: c78974b0b4505c646b17176ad5ebf08b, type: 3}
+    - {fileID: -143125057, guid: 1f99a99115cf91840a5f7e3b4b015051, type: 3}
   m_AnimationClipSettings:
     serializedVersion: 2
     m_AdditiveReferencePoseClip: {fileID: 0}
     m_AdditiveReferencePoseTime: 0
     m_StartTime: 0
-    m_StopTime: 0.33333334
+    m_StopTime: 0.15
     m_OrientationOffsetY: 0
     m_Level: 0
     m_CycleOffset: 0
@@ -78,4 +78,18 @@ AnimationClip:
   m_EulerEditorCurves: []
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 0
-  m_Events: []
+  m_Events:
+  - time: 0.15
+    functionName: PlayLandSoundSfx
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 0.15
+    functionName: PlayLandSoundSfx
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0

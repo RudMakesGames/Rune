@@ -133,6 +133,13 @@ public class PlayerController : MonoBehaviour
     Vector3 ThrownDirection = Vector3.right * 0.5f;
 
     private ShowSkullOnKillableEnemy _previousSkullTarget;
+
+
+    [Header("Camera Effects")]
+    [SerializeField]
+    private CinemachineVirtualCamera CinemachineVirtualCamera;
+    [SerializeField]
+    private float OriginalCamSize = 4.3f, CloseUpCamSize = 1.95f , Duration = 0.5f;
     public enum Element
     {
         None,
@@ -173,15 +180,7 @@ public class PlayerController : MonoBehaviour
     }
     void Update()
     {
-        if(!isGrounded())
-        {
-            IsAllowedToAirAssasinate = true;
-            
-        }
-        else
-        {
-            IsAllowedToAirAssasinate = false;
-        }
+       
         CheckForAirKill();
 
         Vector2 direction = new Vector2(horizontal, vertical);
@@ -247,10 +246,12 @@ public class PlayerController : MonoBehaviour
         if (isGrounded())
         {
             Anim.SetBool("IsFalling", false);
+            IsAllowedToAirAssasinate = false;
         }
         else
         {
             Anim.SetBool("IsFalling", true);
+            IsAllowedToAirAssasinate = true;
         }
         //Dodge Timer
         if (dodgeCooldownTimer > 0)
@@ -283,7 +284,34 @@ public class PlayerController : MonoBehaviour
 
 
     }
+    private IEnumerator LerpOrthoLensSize(float TargetSize, float time)
+    {
+        float startSize = CinemachineVirtualCamera.m_Lens.OrthographicSize;
+        float elapsed = 0f;
 
+        while (elapsed < time)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / time;
+            CinemachineVirtualCamera.m_Lens.OrthographicSize = Mathf.Lerp(startSize, TargetSize, t);
+            yield return null;
+        }
+        CinemachineVirtualCamera.m_Lens.OrthographicSize = TargetSize;
+    }
+    private void CloseUpCamera()
+    {
+        StartCoroutine(LerpOrthoLensSize(CloseUpCamSize,Duration));
+    }
+    private void ResetCamera()
+    {
+        StartCoroutine(LerpOrthoLensSize(OriginalCamSize, Duration));
+    }
+    private IEnumerator StealthKillCinematicEffect()
+    {
+        CloseUpCamera();
+        yield return new WaitForSeconds(0.6f);
+        ResetCamera();
+    }
     #region StealthKill
     private void CheckForStealthKill()
     {
@@ -351,7 +379,7 @@ public class PlayerController : MonoBehaviour
                         skull.ActivateIcon();
                         _previousSkullTarget = skull;
                         IsInRangeToKill = true;
-                        EnemyPos = skull.StealthKillPosition;
+                        EnemyPos = skull.AirAssasinationTransform;
 
 
                         _currentEnemyTarget = hit2d.collider.gameObject;
@@ -384,11 +412,12 @@ public class PlayerController : MonoBehaviour
                 {
                     if (!isKilling && _currentEnemyTarget != null)
                     {
+                    StartCoroutine(StealthKillCinematicEffect());
                         Debug.Log("air assasination performed");
                         isKilling = true;
-                    _currentEnemyTarget.GetComponent<CurveFollower>()?.StartLerpToTarget(gameObject, EnemyPos);
+                        _currentEnemyTarget.GetComponent<CurveFollower>()?.StartLerpToTarget(gameObject, EnemyPos);
 
-                    StartCoroutine(PeformKill());
+                        StartCoroutine(PeformKill());
 
                     }
 
@@ -443,6 +472,28 @@ public class PlayerController : MonoBehaviour
         
      
     }
+    public void CastAirAssasination()
+    {
+
+
+        //used as an animation event
+        RaycastHit2D hit = Physics2D.CircleCast(FiringPoint.position, CircleRadius, Vector2.right, StealthKillRange, HitableLayer);
+
+        if (hit.collider != null && hit.collider.TryGetComponent<IDamageable>(out var healthComponent))
+        {
+            hit.collider.TryGetComponent<WindEnemy>(out var windenemy);
+            hit.collider.TryGetComponent<FireEnemy>(out var fireEnemy);
+            hit.collider.TryGetComponent<WaterEnemy>(out var waterenemy);
+
+            waterenemy?.HandleDeath();
+            windenemy?.HandleDeath();
+            fireEnemy?.HandleDeath();
+
+
+        }
+
+
+    }
     public void PlayStabSoundEffect()
     {
         AudioManager.instance.PlaySoundFXClip(KillSfx, transform, 0.4f, Random.Range(0.9f, 1));
@@ -473,7 +524,11 @@ public class PlayerController : MonoBehaviour
     public void MoveHorizontally(InputAction.CallbackContext context)
     {
         if (EventManager.Instance.isEventActive) return;
-        horizontal = context.ReadValue<Vector2>().x;
+        if(!CanClimb)
+        {
+            horizontal = context.ReadValue<Vector2>().x;
+        }
+       
 
     }
     public void MoveVertically(InputAction.CallbackContext context)
