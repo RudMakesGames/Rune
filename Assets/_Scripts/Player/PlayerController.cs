@@ -140,6 +140,10 @@ public class PlayerController : MonoBehaviour
     private CinemachineVirtualCamera CinemachineVirtualCamera;
     [SerializeField]
     private float OriginalCamSize = 4.3f, CloseUpCamSize = 1.95f , Duration = 0.5f;
+    [SerializeField]
+    private GameObject CinematicBars;
+    [SerializeField]
+    RedFilterEffect redFilterEffect;
     public enum Element
     {
         None,
@@ -309,8 +313,12 @@ public class PlayerController : MonoBehaviour
     private IEnumerator StealthKillCinematicEffect()
     {
         CloseUpCamera();
+        redFilterEffect?.EnableRedFilter();
+        CinematicBars?.SetActive(true);
         yield return new WaitForSeconds(0.6f);
         ResetCamera();
+        redFilterEffect?.DisableRedFilter();
+        CinematicBars?.SetActive(false);
     }
     #region StealthKill
     private void CheckForStealthKill()
@@ -435,6 +443,7 @@ public class PlayerController : MonoBehaviour
                 if(!isKilling)
                 {
                     isKilling = true;
+                    StartCoroutine(StealthKillCinematicEffect());
                     transform.position = EnemyPos.position;
                     Anim.SetTrigger("Stab");
                     StartCoroutine(PeformKill());
