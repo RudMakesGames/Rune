@@ -12,11 +12,23 @@ public class ladderDetect : MonoBehaviour
     }
     private void OnTriggerStay2D(Collider2D collision)
     {
+       // Debug.Log("detected smth");
         if (collision.gameObject.tag == "Player")
         {
-            ladderClimbScript.ladder = collision.gameObject;
-            ladderClimbScript.GetWaypoints();
+            //ladderClimbScript.ladder = this.gameObject;
+            //ladderClimbScript.GetWaypoints();
             ladderClimbScript.canClimbLadder = true;
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        // Debug.Log("detected smth");
+        if (collision.gameObject.tag == "Player")
+        {
+            ladderClimbScript.ladder = this.gameObject;
+            ladderClimbScript.GetWaypoints();
+            //ladderClimbScript.canClimbLadder = true;
         }
     }
 
